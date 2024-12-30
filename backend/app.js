@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend URL
+  origin: 'https://calendar-communication-tracker-frontend.onrender.com', // Frontend URL
   credentials: true, 
 }));
 
