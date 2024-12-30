@@ -1,7 +1,7 @@
 // src/api/communication.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/communication-methods';
+const API_URL = 'https://calendar-communication-tracker-backend.onrender.com/api/communication-methods';
 
 export const getCommunicationMethods = async () => {
   try {

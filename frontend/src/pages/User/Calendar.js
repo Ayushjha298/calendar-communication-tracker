@@ -14,8 +14,8 @@ const CalendarView = () => {
     const [selectedCompanies, setSelectedCompanies] = useState([]);
     const [actionModalVisible, setActionModalVisible] = useState(false);
     const [error, setError] = useState(null);
-    const [actionData, setActionData] = useState({ type: "", date: "", notes: "" });
-    const [selectedDate, setSelectedDate] = useState(null); // Store selected date
+    const [actionData, setActionData] = useState({ type: "", date: "", time: "", notes: "" });
+    const [selectedDate, setSelectedDate] = useState(null); 
     const [overdueNotifications, setOverdueNotifications] = useState([]);
     const [dueNotifications, setDueNotifications] = useState([]);
     const navigate = useNavigate();
@@ -27,46 +27,51 @@ const CalendarView = () => {
     const loadCompanies = async () => {
         try {
             const token = localStorage.getItem("token");
+            console.log("Token:", token);
             const data = await fetchCompanies(token);
+            console.log("Fetched Data:", data);
+            
             setCompanies(data || []);
-            calculateNotifications(data);  // Calculate overdue and due notifications
+            calculateNotifications(data);
         } catch (err) {
+            console.error("Error fetching companies:", err);
             setError("Failed to load companies");
         }
     };
 
     const calculateNotifications = (companies) => {
-        const currentDate = moment();
+        const currentDate = moment().startOf('day');  
         let overdue = [];
         let dueToday = [];
-
+    
         companies.forEach((company) => {
             company.lastFiveCommunications.forEach((comm) => {
-                const commDate = moment(comm.date, "DD/MM/YYYY");
-                if (commDate.isBefore(currentDate, "day")) {
+                const commDate = moment(comm.date).startOf('day'); 
+                if (commDate.isBefore(currentDate, "day")) {  
                     overdue.push({ company, comm });
-                } else if (commDate.isSame(currentDate, "day")) {
+                } else if (commDate.isSame(currentDate, "day")) { 
                     dueToday.push({ company, comm });
                 }
             });
-
+    
             if (company.nextScheduledCommunication) {
-                const nextCommDate = moment(company.nextScheduledCommunication.date, "DD/MM/YYYY");
-                if (nextCommDate.isBefore(currentDate, "day")) {
+                const nextCommDate = moment(company.nextScheduledCommunication.date).startOf('day');  
+                if (nextCommDate.isBefore(currentDate, "day")) {  
                     overdue.push({ company, comm: company.nextScheduledCommunication });
-                } else if (nextCommDate.isSame(currentDate, "day")) {
+                } else if (nextCommDate.isSame(currentDate, "day")) {  
                     dueToday.push({ company, comm: company.nextScheduledCommunication });
                 }
             }
         });
-
+    
         setOverdueNotifications(overdue);
         setDueNotifications(dueToday);
     };
+    
 
     const handleActionSubmit = async () => {
         try {
-            console.log("Selected Companies:", selectedCompanies); // Debugging log
+            console.log("Selected Companies:", selectedCompanies); 
             if (selectedCompanies.length === 0) {
                 setError("Please select at least one company.");
                 return;
@@ -76,11 +81,11 @@ const CalendarView = () => {
             const communicationData = selectedCompanies.map((companyId) => ({
                 companyId,
                 communicationType: actionData.type,
-                communicationDate: actionData.date,
+                communicationDate: `${actionData.date}T${actionData.time}`, 
                 notes: actionData.notes,
             }));
 
-            console.log("Communication Data:", communicationData); // Debugging log
+            console.log("Communication Data:", communicationData); 
 
             await Promise.all(
                 communicationData.map(async (data) => {
@@ -90,17 +95,17 @@ const CalendarView = () => {
 
             setActionModalVisible(false);
             setSelectedCompanies([]);
-            setActionData({ type: "", date: "", notes: "" });
+            setActionData({ type: "", date: "", time: "", notes: "" });
             loadCompanies();
         } catch (err) {
-            console.error(err); // Log error for debugging
+            console.error(err); 
             setError("Failed to log communication");
         }
     };
 
     const openActionModal = (date) => {
-        setSelectedDate(moment(date).format("YYYY-MM-DD")); // Store the selected date
-        setActionModalVisible(true); // Open modal
+        setSelectedDate(moment(date).format("YYYY-MM-DD"));
+        setActionModalVisible(true); 
     };
 
     const closeActionModal = () => setActionModalVisible(false);
@@ -111,8 +116,8 @@ const CalendarView = () => {
             company.lastFiveCommunications.forEach((comm) => {
                 events.push({
                     title: `${company.name}: ${comm.type}`,
-                    start: moment(comm.date, "DD/MM/YYYY").toDate(),
-                    end: moment(comm.date, "DD/MM/YYYY").toDate(),
+                    start: moment(comm.date).toDate(),
+                    end: moment(comm.date).toDate(),
                     notes: comm.notes,
                 });
             });
@@ -120,14 +125,8 @@ const CalendarView = () => {
             if (company.nextScheduledCommunication) {
                 events.push({
                     title: `${company.name}: ${company.nextScheduledCommunication.type}`,
-                    start: moment(
-                        company.nextScheduledCommunication.date,
-                        "DD/MM/YYYY"
-                    ).toDate(),
-                    end: moment(
-                        company.nextScheduledCommunication.date,
-                        "DD/MM/YYYY"
-                    ).toDate(),
+                    start: moment(company.nextScheduledCommunication.date).toDate(),
+                    end: moment(company.nextScheduledCommunication.date).toDate(),
                 });
             }
         });
@@ -147,7 +146,7 @@ const CalendarView = () => {
                             <li 
                                 key={index} 
                                 className="list-group-item" 
-                                style={{ backgroundColor: "red", color: "white" }} // Red highlight for overdue
+                                style={{ backgroundColor: "red", color: "white" }} 
                             >
                                 <strong>{company.name}</strong>: {comm.type} on {comm.date}
                             </li>
@@ -161,7 +160,7 @@ const CalendarView = () => {
                             <li 
                                 key={index} 
                                 className="list-group-item" 
-                                style={{ backgroundColor: "yellow" }} // Yellow highlight for due today
+                                style={{ backgroundColor: "yellow" }} 
                             >
                                 <strong>{company.name}</strong>: {comm.type} on {comm.date}
                             </li>
@@ -176,11 +175,9 @@ const CalendarView = () => {
                 startAccessor="start"
                 endAccessor="end"
                 style={{ height: 500 }}
-                onSelectSlot={(slotInfo) => openActionModal(slotInfo.start)} // Open modal when a date is selected
-                selectable={true}
+                onSelectSlot={(slotInfo) => openActionModal(slotInfo.start)}
             />
 
-            {/* Action Modal */}
             <Modal show={actionModalVisible} onHide={closeActionModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Log Communication</Modal.Title>
@@ -226,11 +223,11 @@ const CalendarView = () => {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Date of Communication</label>
+                            <label>Communication Date</label>
                             <input
                                 type="date"
                                 className="form-control"
-                                value={actionData.date || selectedDate}
+                                value={actionData.date}
                                 onChange={(e) =>
                                     setActionData((prev) => ({
                                         ...prev,
@@ -240,9 +237,24 @@ const CalendarView = () => {
                             />
                         </div>
                         <div className="form-group">
+                            <label>Communication Time</label>
+                            <input
+                                type="time"
+                                className="form-control"
+                                value={actionData.time}
+                                onChange={(e) =>
+                                    setActionData((prev) => ({
+                                        ...prev,
+                                        time: e.target.value,
+                                    }))
+                                }
+                            />
+                        </div>
+                        <div className="form-group">
                             <label>Notes</label>
                             <textarea
                                 className="form-control"
+                                rows="3"
                                 value={actionData.notes}
                                 onChange={(e) =>
                                     setActionData((prev) => ({
@@ -259,7 +271,7 @@ const CalendarView = () => {
                         className="btn btn-secondary"
                         onClick={closeActionModal}
                     >
-                        Cancel
+                        Close
                     </button>
                     <button
                         className="btn btn-primary"

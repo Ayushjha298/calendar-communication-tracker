@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/communication-logs'; 
+const API_URL = 'https://calendar-communication-tracker-backend.onrender.com/api/communication-logs'; 
 
 
 const createConfig = (token) => ({
