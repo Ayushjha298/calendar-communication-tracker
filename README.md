@@ -59,7 +59,7 @@ You can check out the live demo of the project here: <a href="https://calendar-c
 
 ## Technologies Used
 
-- **Frontend:** React, Redux, Tailwind CSS
+- **Frontend:** React
 - **Backend:** Node.js, Express
 - **Database:** MongoDB
 - **Authentication:** JSON Web Tokens (JWT)
@@ -71,7 +71,7 @@ You can check out the live demo of the project here: <a href="https://calendar-c
 
 ### Prerequisites
 - Node.js and npm installed
-- MongoDB setup (local or cloud, e.g., MongoDB Atlas)
+- MongoDB setup (MongoDB Atlas)
 
 ### Installation
 
