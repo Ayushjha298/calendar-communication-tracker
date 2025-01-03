@@ -82,29 +82,36 @@ You can check out the live demo of the project here: <a href="https://calendar-c
 
 2. Install dependencies:
     For the backend:
+   ```bash
       cd backend
       npm install
+    ```
     For the frontend:
+   ```bash
       cd frontend
       npm install
-
+   ```
+   
 3. Set up environment variables:
 
     Backend: Create a .env file in the backend folder with
-
+    ```
     MONGO_URI=<your-mongo-db-uri>
     JWT_SECRET=<your-secret-key>
+    ```
 
 4. Run the application locally:
 
     Start the backend:
+   ```bash
     cd backend
     npm run dev
-
+    ```
     Start the frontend:
+   ```bash
     cd frontend
     npm start
-
+    ```
 Deployment
 
 Deployed on Render:
